@@ -13,10 +13,39 @@ class City:
 
     def start(self):
         """
-        TODO
         :return: string
         """
-        return str()
+        num_of_attacks = 0
+        num_of_retreat = 0
+        logging.info("Listen to incoming messages...")
+        while True:
+            message = self.node_socket.listen()
+            if message:
+                general, action = message[0].split('~')
+                action = int(action[-1])
+                if action == 0:
+                    logging.info(f"{general} RETREAT from us!")
+                    num_of_retreat += 1
+                else:
+                    logging.info(f"{general} ATTACK us!")
+                    num_of_attacks += 1
+            if (num_of_attacks + num_of_retreat) == self.number_general:
+                break
+        logging.info("Concluding what happen...")
+
+        if self.number_general < 2:
+            logging.info("GENERAL CONSENSUS: ERROR_LESS_THAN_TWO_GENERALS")
+            return "ERROR_LESS_THAN_TWO_GENERALS"
+
+        if num_of_attacks > num_of_retreat:
+            logging.info("GENERAL CONSENSUS: ATTACK")
+            return "ATTACK"
+        elif num_of_attacks < num_of_retreat:
+            logging.info("GENERAL CONSENSUS: RETREAT")
+            return "RETREAT"
+        else:
+            logging.info("GENERAL CONSENSUS: FAILED")
+            return "FAILED"
 
 
 def thread_exception_handler(args):
